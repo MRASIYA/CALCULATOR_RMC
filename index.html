@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit to Google Sheets</title>
+</head>
+<body>
+  <h2>Submit Form</h2>
+  <form id="data-form">
+    <label>Name:</label><br />
+    <input type="text" name="name" required /><br /><br />
+    
+    <label>Email:</label><br />
+    <input type="email" name="email" required /><br /><br />
+    
+    <label>Message:</label><br />
+    <textarea name="message" required></textarea><br /><br />
+    
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="response"></p>
+
+  <script>
+    const form = document.getElementById('data-form');
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbxI9UxsZrNbr8LQG4YMXwUxQJl8kacUl_jWHcJXZzG3HPKFYA4z73_kRkEG3o8MIO2H/exec", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+
+        if (json.result === "Success") {
+          document.getElementById("response").innerText = "Form submitted successfully!";
+          form.reset();
+        } else {
+          document.getElementById("response").innerText = "Server error: " + json.message;
+        }
+      } catch (err) {
+        document.getElementById("response").innerText = "Error submitting form.";
+        console.error("Fetch error:", err);
+      }
+    });
+  </script>
+</body>
+</html>
